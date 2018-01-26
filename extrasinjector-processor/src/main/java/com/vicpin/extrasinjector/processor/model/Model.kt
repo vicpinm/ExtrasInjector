@@ -1,84 +1,62 @@
 package com.vicpin.extrasinjector.processor.model
 
-
-import com.vicpin.butcherknife.annotation.processor.entity.EntityProperty
+import com.vicpin.butcherknife.annotation.processor.entity.ExtraProperty
 import com.vicpin.extrasinjector.processor.EnvironmentUtil
+import com.vicpin.extrasprocessor.annotations.ForActivity
+import com.vicpin.extrasprocessor.annotations.ForFragment
 import javax.annotation.processing.RoundEnvironment
-import javax.lang.model.element.Element
 import javax.lang.model.element.ElementKind
-import javax.lang.model.element.PackageElement
-
 
 /**
  * Created by Oesia on 07/12/2017.
  */
 class Model private constructor() {
 
-    var entities = mutableListOf<EntityModel>()
+    var packpage = ""
+    var extraProperties = mutableListOf<ExtraProperty>()
 
     private fun parseAnnotation(env: RoundEnvironment, annotationClass: Class<Annotation>) {
         val annotatedFields = env.getElementsAnnotatedWith(annotationClass)
 
+        packpage = EnvironmentUtil.getCommonRootPackage(annotatedFields)
+
         for (annotatedField in annotatedFields) {
-            if (annotatedField.kind != ElementKind.FIELD) {
+
+            if (annotatedField.getAnnotation(ForActivity::class.java) != null ||
+                    annotatedField.getAnnotation(ForFragment::class.java) != null) {
+                if (annotatedField.kind != ElementKind.CLASS) {
+                    EnvironmentUtil.logError(annotationClass.simpleName + " can only be used for classes")
+                }
+                break
+            } else if (annotatedField.kind != ElementKind.FIELD) {
                 EnvironmentUtil.logError(annotationClass.simpleName + " can only be used for properties")
                 break
             }
 
-            val entity = createEntityModel(annotatedField.enclosingElement)
-            val property = EntityProperty(annotatedField)
+            val property = ExtraProperty(annotatedField)
 
-            entity.addProperty(property)
-            entities.add(entity)
-
+            extraProperties.add(property)
         }
-
     }
 
-    private fun createEntityModel(parentClass: Element): EntityModel {
-
-        var entityModel = findEntityModel(parentClass)
-        if (entityModel == null) {
-            entityModel = EntityModel(parentClass, getPackpageFor(parentClass))
-            entities.add(entityModel)
+    fun getExtrasForActivities(): Map<String, List<ExtraProperty>> {
+        val map = mutableMapOf<String, List<ExtraProperty>>()
+        val activities = extraProperties.filter { it.activityClass != null }.distinctBy { it.activityClass }.map { it.activityClass }
+        for(activity in activities) {
+            map[activity!!] = extraProperties.filter { it.activityClass == activity }
         }
-
-        return entityModel
-
-
+        return map
     }
 
-    private fun getPackpageFor(parentClass: Element): String {
-        var parent = parentClass.enclosingElement
-        while (parent !is PackageElement) {
-            parent = parent.enclosingElement
+    fun getExtrasForFragments(): Map<String, List<ExtraProperty>> {
+        val map = mutableMapOf<String, List<ExtraProperty>>()
+        val fragments = extraProperties.filter { it.fragmentClass != null }.distinctBy { it.fragmentClass }.map { it.fragmentClass }
+        for(fragment in fragments) {
+            map[fragment!!] = extraProperties.filter { it.fragmentClass == fragment }
         }
-        return parent.qualifiedName.toString()
+        return map
     }
 
-    private fun findEntityModel(modelClass: Element): EntityModel? {
-        return entities.firstOrNull { it.modelClass == modelClass }
-    }
-
-
-    inner class EntityModel(internal val modelClass: Element, internal val pkg: String) {
-        var name: String
-        var properties = mutableListOf<EntityProperty>()
-
-        init {
-            this.name = modelClass.simpleName.toString()
-        }
-
-        fun addProperty(property: EntityProperty) {
-            properties.add(property)
-        }
-
-        fun getPropertyName(property: EntityProperty): String {
-            return "${name.toLowerCase()}_${properties.indexOf(property)}"
-        }
-
-
-    }
 
     companion object {
 

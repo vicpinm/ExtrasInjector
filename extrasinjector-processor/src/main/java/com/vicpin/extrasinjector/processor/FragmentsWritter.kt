@@ -8,10 +8,10 @@ import javax.annotation.processing.ProcessingEnvironment
 /**
  * Created by victor on 10/12/17.
  */
-class ActivitiesWritter {
+class FragmentsWritter {
 
     companion object {
-        private val CLASS_NAME = "Activities"
+        private val CLASS_NAME = "Fragments"
         private val KAPT_KOTLIN_GENERATED_OPTION = "kapt.kotlin.generated"
     }
 
@@ -24,24 +24,27 @@ class ActivitiesWritter {
     }
 
     private fun generateImports() {
-        writter.writeImport("import android.content.Context")
         writter.writeImport("import android.content.Intent")
+        writter.writeImport("import android.support.v4.app.Fragment")
+        writter.writeImport("import android.os.Bundle")
     }
 
     private fun generateClass() {
         writter.openClass("object $CLASS_NAME")
     }
 
-    fun generateIntentMethod(forActivity: String, withExtras: List<ExtraProperty>) {
+    fun generateFragmentMethod(forFragment: String, withExtras: List<ExtraProperty>) {
         writter.apply {
             val params = withExtras.joinToString { "${it.name}: ${it.getExtraClass()}" }
 
-            openMethod("fun intentFor$forActivity(context: Context, $params) : Intent")
-            methodBody("val intent = Intent(context, $forActivity::class.java)")
+            openMethod("fun create$forFragment($params) : Fragment")
+            methodBody("val fragment = $forFragment()")
+            methodBody("val args = Bundle()")
             for(extra in withExtras) {
-                methodBody("intent.putExtra(\"${extra.name}\",${extra.name})")
+                methodBody(extra.getBindExtraLine(argumentsVariable = "args"))
             }
-            methodBody("return intent")
+            methodBody("fragment.arguments = args")
+            methodBody("return fragment")
             closeMethod()
         }
     }

@@ -5,6 +5,7 @@ import com.vicpin.extrasinjector.processor.lastSegmentFrom
 import com.vicpin.extrasprocessor.annotations.ForActivity
 import com.vicpin.extrasprocessor.annotations.ForFragment
 import javax.lang.model.element.Element
+import javax.lang.model.element.Modifier
 import javax.lang.model.type.MirroredTypeException
 import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
@@ -29,6 +30,13 @@ class ExtraProperty(annotatedField: Element) {
         getViewClass(annotatedField.enclosingElement)
 
         EnvironmentUtil.logWarning("name: $name type $type presenter $presenterClass activity $activityClass")
+
+        for(modifier in annotatedField.modifiers) {
+            EnvironmentUtil.logWarning("name $name modifiers $modifier")
+        }
+        if (annotatedField.modifiers.contains(Modifier.PRIVATE)) {
+           // EnvironmentUtil.logError("field $name in class $$presenterClass has to be public in order to inject extras")
+        }
     }
 
     private fun getViewClass(presenter: Element) {
@@ -77,9 +85,17 @@ class ExtraProperty(annotatedField: Element) {
         return typeString
     }
 
-    fun getBindExtraLine(argumentsVariable: String) = "$argumentsVariable.${getPutMethod()}(\"$name\",$name)"
+    fun getArgumentsPutMethod(argumentsVariable: String) = "$argumentsVariable.${putMethod()}(\"$name\",$name)"
 
-    private fun getPutMethod() =
+    fun getBindMethod(targetVariable: String, bundleVariable: String) : String {
+        var line = "$targetVariable.$name = $bundleVariable.${getMethod()}(\"$name\")"
+        if(!type.kind.isPrimitive && type.toString() != String::class.java.name && EnvironmentUtil.isSerializable(type)) {
+            line += " as $type"
+        }
+        return line
+    }
+
+    private fun putMethod() =
             when {
                 type.kind == TypeKind.INT -> "putInt"
                 type.kind == TypeKind.LONG -> "putLong"
@@ -95,5 +111,24 @@ class ExtraProperty(annotatedField: Element) {
                     ""
                 }
             }
+
+    private fun getMethod() =
+            when {
+                type.kind == TypeKind.INT -> "getInt"
+                type.kind == TypeKind.LONG -> "getLong"
+                type.kind == TypeKind.FLOAT -> "getFloat"
+                type.kind == TypeKind.DOUBLE -> "getDouble"
+                type.kind == TypeKind.BOOLEAN -> "getBoolean"
+                type.kind == TypeKind.CHAR -> "getString"
+                type.toString() == String::class.java.name -> "getString"
+                EnvironmentUtil.isParcelable(type) -> "getParcelable"
+                EnvironmentUtil.isSerializable(type) -> "getSerializable"
+                else -> {
+                    EnvironmentUtil.logError("@InjectExtra annotation does not support field type " + type.kind.toString())
+                    ""
+                }
+            }
+
+
 
 }

@@ -1,9 +1,17 @@
-package com.vicpin.extrasinjector.processor
+package com.vicpin.extrasinjector.processor.writter
+
+import java.io.File
+import java.io.IOException
+import javax.annotation.processing.ProcessingEnvironment
 
 /**
  * Created by Oesia on 26/01/2018.
  */
-class Writter() {
+class FileWritter() {
+
+    companion object {
+        private val KAPT_KOTLIN_GENERATED_OPTION = "kapt.kotlin.generated"
+    }
 
     var text = ""
 
@@ -48,6 +56,22 @@ class Writter() {
 
     fun methodBody(line: String, indentationLevel: Int = 0) {
         newLine(line, level = indentationLevel + 2)
+    }
+
+    fun generateFile(env: ProcessingEnvironment, packpage: String, className: String) {
+
+        try { // write the env
+            val options = env.options
+            val kotlinGenerated = options[KAPT_KOTLIN_GENERATED_OPTION] ?: ""
+
+            File(kotlinGenerated.replace("kaptKotlin","kapt"), "$packpage.$className.kt").writer().buffered().use {
+                it.appendln(text)
+            }
+
+        } catch (e: IOException) {
+            // Note: calling e.printStackTrace() will print IO errors
+            // that occur from the file already existing after its first run, this is normal
+        }
     }
 
 

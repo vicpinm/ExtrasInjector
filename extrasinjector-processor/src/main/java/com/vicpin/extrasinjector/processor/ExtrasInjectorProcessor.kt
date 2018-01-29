@@ -2,6 +2,9 @@ package com.vicpin.extrasinjector.processor
 
 
 import com.vicpin.extrasinjector.processor.model.Model
+import com.vicpin.extrasinjector.processor.writter.ActivitiesWritter
+import com.vicpin.extrasinjector.processor.writter.ExtrasInjectorWritter
+import com.vicpin.extrasinjector.processor.writter.FragmentsWritter
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.RoundEnvironment
@@ -14,6 +17,7 @@ class ExtrasInjectorProcessor : AbstractProcessor() {
 
     val activitiesWritter = ActivitiesWritter()
     val fragmentsWritter = FragmentsWritter()
+    val extrasInjectorWritter = ExtrasInjectorWritter()
 
     @Synchronized override fun init(processingEnv: ProcessingEnvironment) {
         super.init(processingEnv)
@@ -27,44 +31,51 @@ class ExtrasInjectorProcessor : AbstractProcessor() {
         if(model.extraProperties.size > 0) {
             generateActivitiesFileForModel(model)
             generateFragmentsFileForModel(model)
+            generateExtrasInjectorFileForModel(model)
         }
 
         return true
     }
 
     private fun generateActivitiesFileForModel(model: Model) {
-
-        if(model.getExtrasForActivities().isNotEmpty()) {
-            activitiesWritter.createPackage(model.packpage)
-
-            for (extrasForActivity in model.getExtrasForActivities()) {
-                EnvironmentUtil.logWarning("Processing extras for activity: " + extrasForActivity.key)
-                activitiesWritter.generateIntentMethod(forActivity = extrasForActivity.key,
-                        withExtras = extrasForActivity.value)
-            }
-
-            activitiesWritter.closeClass()
-            activitiesWritter.generateFile(processingEnv, model.packpage)
-        }
+        activitiesWritter.writeModel(model.packpage, model.getExtrasForActivities(), processingEnv)
     }
 
     private fun generateFragmentsFileForModel(model: Model) {
-        if(model.getExtrasForFragments().isNotEmpty()) {
-
-            fragmentsWritter.createPackage(model.packpage)
-
-            for (extrasForFragments in model.getExtrasForFragments()) {
-                EnvironmentUtil.logWarning("Processing extras for fragment: " + extrasForFragments.key)
-                fragmentsWritter.generateFragmentMethod(forFragment = extrasForFragments.key,
-                        withExtras = extrasForFragments.value)
-            }
-
-            fragmentsWritter.closeClass()
-            fragmentsWritter.generateFile(processingEnv, model.packpage)
-        }
+        fragmentsWritter.writeModel(model.packpage, model.getExtrasForFragments(), processingEnv)
     }
 
 
+    private fun generateExtrasInjectorFileForModel(model: Model) {
+        val extrasByActivityPresenters = model.getExtrasForActivityPresenters()
+        val extrasByFragmentPresenters = model.getExtrasForFragmentPresenters()
+
+        if(extrasByActivityPresenters.isNotEmpty() || extrasByFragmentPresenters.isNotEmpty()) {
+
+            extrasInjectorWritter.createPackage(model.packpage)
+
+            if(extrasByActivityPresenters.isNotEmpty()) {
+                extrasInjectorWritter.generateActivityBindGenericMethod(activityPresenters = extrasByActivityPresenters.keys.toList())
+
+                for (extrasForActivities in model.getExtrasForActivityPresenters()) {
+                    extrasInjectorWritter.generateActivityBindMethod(targetClass = extrasForActivities.key,
+                            withExtras = extrasForActivities.value)
+                }
+            }
+
+            if(extrasByFragmentPresenters.isNotEmpty()) {
+                extrasInjectorWritter.generateFragmentBindGenericMethod(fragmentPresenters = extrasByFragmentPresenters.keys.toList())
+
+                for (extrasForFragments in model.getExtrasForFragmentPresenters()) {
+                    extrasInjectorWritter.generateFragmentBindMethod(targetClass = extrasForFragments.key,
+                            withExtras = extrasForFragments.value)
+                }
+            }
+
+            extrasInjectorWritter.closeClass()
+            extrasInjectorWritter.generateFile(processingEnv, model.packpage)
+        }
+    }
 
     override fun getSupportedSourceVersion(): SourceVersion {
         return SourceVersion.latestSupported()

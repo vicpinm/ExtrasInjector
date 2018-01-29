@@ -10,7 +10,7 @@ import java.io.Serializable
  * Created by victor on 25/1/18.
  */
 
-@ForActivity(activityClass = MainActivity::class)
+@ForActivity(MainActivity::class)
 class MainPresenter {
 
     @InjectExtra
@@ -23,7 +23,7 @@ class MainPresenter {
     var e3 = 3
 
     @InjectExtra
-    var value3 = true
+    var value3aa : Boolean = false
 
     @InjectExtra
     var value4 = 0f

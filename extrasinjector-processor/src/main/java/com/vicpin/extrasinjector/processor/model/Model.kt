@@ -57,6 +57,24 @@ class Model private constructor() {
         return map
     }
 
+    fun getExtrasForActivityPresenters(): Map<String, List<ExtraProperty>> {
+        val map = mutableMapOf<String, List<ExtraProperty>>()
+        val activityPresenters = extraProperties.filter { it.activityClass != null }.distinctBy { it.presenterClass }.map { it.presenterClass }
+        for(presenter in activityPresenters) {
+            map[presenter] = extraProperties.filter { it.presenterClass == presenter }
+        }
+        return map
+    }
+
+    fun getExtrasForFragmentPresenters(): Map<String, List<ExtraProperty>> {
+        val map = mutableMapOf<String, List<ExtraProperty>>()
+        val fragmentPresenters = extraProperties.filter { it.fragmentClass != null }.distinctBy { it.presenterClass }.map { it.presenterClass }
+        for(presenter in fragmentPresenters) {
+            map[presenter] = extraProperties.filter { it.presenterClass == presenter }
+        }
+        return map
+    }
+
 
     companion object {
 

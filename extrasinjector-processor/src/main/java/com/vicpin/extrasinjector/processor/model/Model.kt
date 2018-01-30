@@ -1,7 +1,7 @@
 package com.vicpin.extrasinjector.processor.model
 
 import com.vicpin.butcherknife.annotation.processor.entity.ExtraProperty
-import com.vicpin.extrasinjector.processor.EnvironmentUtil
+import com.vicpin.extrasinjector.processor.util.EnvironmentUtil
 import com.vicpin.extrasprocessor.annotations.ForActivity
 import com.vicpin.extrasprocessor.annotations.ForFragment
 import javax.annotation.processing.RoundEnvironment
@@ -74,6 +74,8 @@ class Model private constructor() {
         }
         return map
     }
+
+    fun useParcelerLibrary() = extraProperties.any { it.isParcelableWithParceler() }
 
 
     companion object {

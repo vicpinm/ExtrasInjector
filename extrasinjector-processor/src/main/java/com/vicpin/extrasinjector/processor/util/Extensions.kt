@@ -1,4 +1,4 @@
-package com.vicpin.extrasinjector.processor
+package com.vicpin.extrasinjector.processor.util
 
 /**
  * Created by Oesia on 26/01/2018.

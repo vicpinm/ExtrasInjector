@@ -7,7 +7,7 @@ import javax.annotation.processing.ProcessingEnvironment
 /**
  * Created by Oesia on 26/01/2018.
  */
-class FileWritter() {
+class FileWritter {
 
     companion object {
         private val KAPT_KOTLIN_GENERATED_OPTION = "kapt.kotlin.generated"

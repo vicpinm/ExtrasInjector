@@ -9,11 +9,11 @@ class MainActivity2 : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        var a=MainPresenter2()
 
+        ExtrasInjector.bind(this, a)
 
-
-Ex
-
+        var s = 3;
 
     }
 

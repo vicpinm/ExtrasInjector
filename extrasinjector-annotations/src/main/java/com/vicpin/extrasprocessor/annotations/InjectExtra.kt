@@ -9,4 +9,4 @@ import java.lang.annotation.RetentionPolicy
 
 @Retention(RetentionPolicy.CLASS)
 @Target(AnnotationTarget.FIELD)
-annotation class InjectExtra
+annotation class InjectExtra(val optional : Boolean = false)

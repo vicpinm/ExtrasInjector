@@ -1,4 +1,4 @@
-package com.vicpin.extrasinjector.processor
+package com.vicpin.extrasinjector.processor.util
 
 import com.squareup.javapoet.JavaFile
 import com.squareup.javapoet.TypeSpec
@@ -85,6 +85,10 @@ object EnvironmentUtil {
     fun getCommonRootPackage(annotatedFields: Set<Element>): String {
         val packpages = annotatedFields.map { getPackpageFor(it) }
         return getCommonRootPackage(packpages)
+    }
+
+    fun isTypeAnnotatedWith(annotationClass: String): Boolean {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
 }

@@ -5,12 +5,13 @@ import java.io.IOException
 import javax.annotation.processing.ProcessingEnvironment
 
 /**
- * Created by Oesia on 26/01/2018.
+ * Created by Victor on 26/01/2018.
  */
 class FileWritter {
 
     companion object {
         private val KAPT_KOTLIN_GENERATED_OPTION = "kapt.kotlin.generated"
+        val PACKAGE: String = "com.vicpin.extrasinjector"
     }
 
     var text = ""
@@ -58,13 +59,12 @@ class FileWritter {
         newLine(line, level = indentationLevel + 2)
     }
 
-    fun generateFile(env: ProcessingEnvironment, packpage: String, className: String) {
+    fun generateFile(env: ProcessingEnvironment, className: String) {
 
         try { // write the env
             val options = env.options
             val kotlinGenerated = options[KAPT_KOTLIN_GENERATED_OPTION] ?: ""
-
-            File(kotlinGenerated.replace("kaptKotlin","kapt"), "$packpage.$className.kt").writer().buffered().use {
+            File(kotlinGenerated.replace("kaptKotlin","kapt"), "$PACKAGE.$className.kt").writer().buffered().use {
                 it.appendln(text)
             }
 

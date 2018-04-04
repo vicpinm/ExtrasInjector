@@ -2,15 +2,16 @@ package com.vicpin.extrasinjector.processor.writter.implementation
 
 import com.vicpin.butcherknife.annotation.processor.entity.ExtraProperty
 import com.vicpin.extrasinjector.processor.model.Model
+import com.vicpin.extrasinjector.processor.writter.FileWritter
 import com.vicpin.extrasinjector.processor.writter.abstraction.Writter
 import javax.annotation.processing.ProcessingEnvironment
 
 /**
- * Created by Oesia on 26/01/2018.
+ * Created by Victor on 26/01/2018.
  */
 class ExtrasInjectorWritter : Writter() {
 
-    override var CLASS_NAME = "ExtrasInjector"
+    override var CLASS_NAME = "ExtrasInjectorFactory"
 
     override fun createPackage(packpage: String) {
         writter.setPackage(packpage)
@@ -33,7 +34,7 @@ class ExtrasInjectorWritter : Writter() {
 
         if(extrasByActivityPresenters.isNotEmpty() || extrasByFragmentPresenters.isNotEmpty()) {
 
-            createPackage(model.packpage)
+            createPackage(FileWritter.PACKAGE)
             generateImports()
 
             if(model.useParcelerLibrary()) {
@@ -61,18 +62,19 @@ class ExtrasInjectorWritter : Writter() {
             }
 
             closeClass()
-            writter.generateFile(processingEnv, model.packpage, CLASS_NAME)
+            writter.generateFile(processingEnv, CLASS_NAME)
         }
     }
 
 
     private fun generateActivityBindGenericMethod(activityPresenters: List<String>) {
         writter.apply {
-            openMethod("fun bind(act: Activity, target: Any)")
+            openMethod("@JvmStatic fun bind(act: Activity, target: Any)")
             methodBody("when(target) {")
             for(presenter in activityPresenters) {
                 methodBody("is $presenter -> bind(act, target)", indentationLevel = 1)
             }
+            methodBody("else -> throw IllegalArgumentException(\"Target \${target::class.java.name} supplied to bind function is not valid. Have you annotated this class with @ForActivity?\")")
             methodBody("}")
             closeMethod()
         }
@@ -80,11 +82,12 @@ class ExtrasInjectorWritter : Writter() {
 
     private fun generateFragmentBindGenericMethod(fragmentPresenters: List<String>) {
         writter.apply {
-            openMethod("fun bind(act: Fragment, target: Any)")
+            openMethod("@JvmStatic fun bind(act: Fragment, target: Any)")
             methodBody("when(target) {")
             for(presenter in fragmentPresenters) {
                 methodBody("is $presenter -> bind(act, target)", indentationLevel = 1)
             }
+            methodBody("else -> throw IllegalArgumentException(\"Target \${target::class.java.name} supplied to bind function is not valid. Have you annotated this class with @ForFragment?\")")
             methodBody("}")
             closeMethod()
         }
@@ -93,10 +96,11 @@ class ExtrasInjectorWritter : Writter() {
     private fun generateActivityBindMethod(targetClass: String, withExtras: List<ExtraProperty>) {
         writter.apply {
             openMethod("fun bind(act: Activity, target: $targetClass)")
-            methodBody("val bundle = act.intent.extras")
+            methodBody("act.intent.extras?.apply {")
             for(extra in withExtras) {
-                methodBody(extra.getBindMethod("target", "bundle"))
+                methodBody(extra.getBindMethod("target"), indentationLevel = 1)
             }
+            methodBody("}")
             closeMethod()
         }
     }
@@ -104,10 +108,11 @@ class ExtrasInjectorWritter : Writter() {
     private fun generateFragmentBindMethod(targetClass: String, withExtras: List<ExtraProperty>) {
         writter.apply {
             openMethod("fun bind(fragment: Fragment, target: $targetClass)")
-            methodBody("val bundle = fragment.arguments")
+            methodBody("fragment.arguments?.apply {")
             for(extra in withExtras) {
-                methodBody(extra.getBindMethod("target", "bundle"))
+                methodBody(extra.getBindMethod("target"), indentationLevel = 1)
             }
+            methodBody("}")
             closeMethod()
         }
     }

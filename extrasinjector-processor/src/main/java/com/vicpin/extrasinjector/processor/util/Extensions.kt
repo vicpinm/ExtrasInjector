@@ -1,7 +1,7 @@
 package com.vicpin.extrasinjector.processor.util
 
 /**
- * Created by Oesia on 26/01/2018.
+ * Created by victor on 10/12/17.
  */
 fun String.lastSegmentFrom(delimiter: String): String {
     return if (endsWith(delimiter)) {

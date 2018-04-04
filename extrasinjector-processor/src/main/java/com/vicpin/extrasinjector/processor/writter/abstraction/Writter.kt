@@ -5,7 +5,7 @@ import com.vicpin.extrasinjector.processor.writter.FileWritter
 import javax.annotation.processing.ProcessingEnvironment
 
 /**
- * Created by Oesia on 29/01/2018.
+ * Created by victor on 10/12/17.
  */
 abstract class Writter {
 

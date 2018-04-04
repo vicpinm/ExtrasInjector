@@ -2,24 +2,25 @@ package com.vicpin.extrasinjector.processor.writter.abstraction
 
 import com.vicpin.butcherknife.annotation.processor.entity.ExtraProperty
 import com.vicpin.extrasinjector.processor.model.Model
+import com.vicpin.extrasinjector.processor.util.EnvironmentUtil
+import com.vicpin.extrasinjector.processor.writter.FileWritter
 import javax.annotation.processing.ProcessingEnvironment
 
 /**
- * Created by Oesia on 29/01/2018.
+ * Created by victor on 10/12/17.
  */
 abstract class ExtrasWritter : Writter() {
 
 
    override fun writeModel(model: Model, processingEnv: ProcessingEnvironment) {
 
-       val packpage = model.packpage
        val extrasForClasses = getExtrasFromModel(model)
 
         if(extrasForClasses.isNotEmpty()) {
-            createPackage(packpage)
+            createPackage(FileWritter.PACKAGE)
             generateImports()
 
-            val importParceler = extrasForClasses.values.any { extrasGrouped -> extrasGrouped.any { it.isParcelableWithParceler() } }
+            val importParceler = extrasForClasses.values.any { extrasGrouped -> extrasGrouped.any { EnvironmentUtil.isParcelableWithParceler(it.type) } }
 
             if(importParceler) {
                 writter.writeImport("import org.parceler.Parcels")
@@ -33,7 +34,7 @@ abstract class ExtrasWritter : Writter() {
             }
 
             closeClass()
-            writter.generateFile(processingEnv, packpage, CLASS_NAME)
+            writter.generateFile(processingEnv, CLASS_NAME)
         }
     }
 

@@ -8,17 +8,14 @@ import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.element.ElementKind
 
 /**
- * Created by Oesia on 07/12/2017.
+ * Created by Victor on 07/12/2017.
  */
 class Model private constructor() {
 
-    var packpage = ""
     var extraProperties = mutableListOf<ExtraProperty>()
 
     private fun parseAnnotation(env: RoundEnvironment, annotationClass: Class<Annotation>) {
         val annotatedFields = env.getElementsAnnotatedWith(annotationClass)
-
-        packpage = EnvironmentUtil.getCommonRootPackage(annotatedFields)
 
         for (annotatedField in annotatedFields) {
 
@@ -75,7 +72,7 @@ class Model private constructor() {
         return map
     }
 
-    fun useParcelerLibrary() = extraProperties.any { it.isParcelableWithParceler() }
+    fun useParcelerLibrary() = extraProperties.any { EnvironmentUtil.isParcelableWithParceler(it.type) }
 
 
     companion object {

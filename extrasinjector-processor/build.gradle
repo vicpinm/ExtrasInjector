@@ -1,6 +1,5 @@
 apply plugin: 'java-library'
 apply plugin: 'kotlin'
-apply from: 'maven-push.gradle'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])

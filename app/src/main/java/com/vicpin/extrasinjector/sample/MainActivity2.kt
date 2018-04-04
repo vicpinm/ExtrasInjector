@@ -11,7 +11,6 @@ class MainActivity2 : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         var a=MainPresenter2()
 
-        ExtrasInjector.bind(this, a)
 
         var s = 3;
 

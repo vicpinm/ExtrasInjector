@@ -1,6 +1,7 @@
 package com.vicpin.butcherknife.annotation.processor.entity
 
 import com.vicpin.extrasinjector.processor.util.EnvironmentUtil
+import com.vicpin.extrasinjector.processor.util.EnvironmentUtil.isParcelableWithParceler
 import com.vicpin.extrasprocessor.annotations.ForActivity
 import com.vicpin.extrasprocessor.annotations.ForFragment
 import com.vicpin.extrasprocessor.annotations.InjectExtra
@@ -13,7 +14,6 @@ import javax.lang.model.type.TypeMirror
 /**
  * Created by victor on 15/12/17.
  */
-
 class ExtraProperty(annotatedField: Element) {
 
     val name: String
@@ -85,29 +85,28 @@ class ExtraProperty(annotatedField: Element) {
         }
 
         if(optional) {
-            typeString += "? "
 
             typeString += when {
                 type.kind == TypeKind.INT -> " = 0"
-                type.kind == TypeKind.LONG -> "= 0L"
-                type.kind == TypeKind.FLOAT -> "= 0F"
-                type.kind == TypeKind.DOUBLE -> "= 0.0"
-                type.kind == TypeKind.BOOLEAN -> "= false"
-                type.kind == TypeKind.CHAR -> "= \"\""
-                else -> "= null"
+                type.kind == TypeKind.LONG -> " = 0L"
+                type.kind == TypeKind.FLOAT -> " = 0F"
+                type.kind == TypeKind.DOUBLE -> " = 0.0"
+                type.kind == TypeKind.BOOLEAN -> " = false"
+                type.kind == TypeKind.CHAR -> " = \"\""
+                else -> "? = null"
             }
         }
         return typeString
     }
 
-    fun getArgumentsPutMethod(argumentsVariable: String) = if(isParcelableWithParceler()) {
+    fun getArgumentsPutMethod(argumentsVariable: String) = if(isParcelableWithParceler(type)) {
         "$argumentsVariable.${putMethod()}(\"$name\",Parcels.wrap($name))"
     }
     else{
         "$argumentsVariable.${putMethod()}(\"$name\",$name)"
     }
 
-    fun getIntentPutMethod(intentVariable: String) = if(isParcelableWithParceler()) {
+    fun getIntentPutMethod(intentVariable: String) = if(isParcelableWithParceler(type)) {
         "$intentVariable.putExtra(\"$name\",Parcels.wrap($name))"
     }
     else{
@@ -115,64 +114,64 @@ class ExtraProperty(annotatedField: Element) {
     }
 
 
-    fun getBindMethod(targetVariable: String, bundleVariable: String) : String {
-        var line = if(isParcelableWithParceler()) {
-            "$targetVariable.$name = Parcels.unwrap($bundleVariable.${getMethod()}(\"$name\"))"
+    fun getBindMethod(targetVariable: String) : String {
+        var line = if(isParcelableWithParceler(type)) {
+            "$targetVariable.$name = Parcels.unwrap(${getMethod()}(\"$name\"))"
         }
         else{
-            "$targetVariable.$name = $bundleVariable.${getMethod()}(\"$name\")"
+            "$targetVariable.$name = ${getMethod()}(\"$name\")"
         }
 
-        if(!type.kind.isPrimitive && type.toString() != String::class.java.name && EnvironmentUtil.isSerializable(type)) {
+        if(!type.kind.isPrimitive && type.toString() != String::class.java.name
+                && !type.toString().contains("java.util.ArrayList")
+                && EnvironmentUtil.isSerializable(type)) {
             line += " as $type"
         }
         return line
     }
 
-    private fun putMethod() =
-            when {
-                type.kind == TypeKind.INT -> "putInt"
-                type.kind == TypeKind.LONG -> "putLong"
-                type.kind == TypeKind.FLOAT -> "putFloat"
-                type.kind == TypeKind.DOUBLE -> "putDouble"
-                type.kind == TypeKind.BOOLEAN -> "putBoolean"
-                type.kind == TypeKind.CHAR -> "putString"
-                type.toString() == String::class.java.name -> "putString"
-                EnvironmentUtil.isParcelable(type) -> "putParcelable"
-                EnvironmentUtil.isSerializable(type) -> "putSerializable"
-                isParcelableWithParceler() -> "putParcelable"
-                else -> {
-                    EnvironmentUtil.logError("@InjectExtra annotation does not support field type ${type.kind} for property $name")
-                    ""
-                }
-            }
+    private fun putMethod() : String {
+        return when {
 
-    private fun getMethod() =
-            when {
-                type.kind == TypeKind.INT -> "getInt"
-                type.kind == TypeKind.LONG -> "getLong"
-                type.kind == TypeKind.FLOAT -> "getFloat"
-                type.kind == TypeKind.DOUBLE -> "getDouble"
-                type.kind == TypeKind.BOOLEAN -> "getBoolean"
-                type.kind == TypeKind.CHAR -> "getString"
-                type.toString() == String::class.java.name -> "getString"
-                EnvironmentUtil.isParcelable(type) -> "getParcelable"
-                EnvironmentUtil.isSerializable(type) -> "getSerializable"
-                isParcelableWithParceler() -> "getParcelable"
-                else -> {
-                    EnvironmentUtil.logError("@InjectExtra annotation does not support field type ${type.kind} for property $name")
-                    ""
-                }
+            type.kind == TypeKind.INT -> "putInt"
+            type.kind == TypeKind.LONG -> "putLong"
+            type.kind == TypeKind.FLOAT -> "putFloat"
+            type.kind == TypeKind.DOUBLE -> "putDouble"
+            type.kind == TypeKind.BOOLEAN -> "putBoolean"
+            type.kind == TypeKind.CHAR -> "putString"
+            type.toString() == String::class.java.name -> "putString"
+            isParcelableWithParceler(type) -> "putParcelable"
+            EnvironmentUtil.isParcelableArray(type) -> "putParcelableArrayList"
+            EnvironmentUtil.isParcelable(type) -> "putParcelable"
+            EnvironmentUtil.isSerializable(type) -> "putSerializable"
+            else -> {
+                EnvironmentUtil.logError("@InjectExtra annotation does not support field type ${type.kind} for property $name")
+                ""
             }
-
-    fun isParcelableWithParceler(): Boolean {
-        EnvironmentUtil.utils?.getTypeElement(type.toString())?.let {
-            return it.annotationMirrors?.filter {
-                it.toString().contains("org.parceler.Parcel")
-            }?.isNotEmpty() ?: false
         }
-        return false
     }
+
+    private fun getMethod() : String {
+        return when {
+            type.kind == TypeKind.INT -> "getInt"
+            type.kind == TypeKind.LONG -> "getLong"
+            type.kind == TypeKind.FLOAT -> "getFloat"
+            type.kind == TypeKind.DOUBLE -> "getDouble"
+            type.kind == TypeKind.BOOLEAN -> "getBoolean"
+            type.kind == TypeKind.CHAR -> "getString"
+            type.toString() == String::class.java.name -> "getString"
+            EnvironmentUtil.isParcelableWithParceler(type) -> "getParcelable"
+            EnvironmentUtil.isParcelableArray(type) -> "getParcelableArrayList"
+            EnvironmentUtil.isParcelable(type) -> "getParcelable"
+            EnvironmentUtil.isSerializable(type) -> "getSerializable"
+            else -> {
+                EnvironmentUtil.logError("@InjectExtra annotation does not support field type ${type.kind} for property $name")
+                ""
+            }
+        }
+    }
+
+
 
 }
 

@@ -2,16 +2,16 @@ package com.vicpin.extrasinjector.processor.util
 
 import com.squareup.javapoet.JavaFile
 import com.squareup.javapoet.TypeSpec
-
 import java.io.IOException
-
 import javax.annotation.processing.ProcessingEnvironment
-import javax.lang.model.element.Element
-import javax.lang.model.element.PackageElement
+import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.Elements
 import javax.tools.Diagnostic
 
+/**
+ * Created by victor on 10/12/17.
+ */
 object EnvironmentUtil {
     private var processingEnvironment: ProcessingEnvironment? = null
     var utils: Elements? = null
@@ -49,46 +49,40 @@ object EnvironmentUtil {
         return processingEnvironment?.typeUtils?.isAssignable(typeMirror, parcelable) ?: false
     }
 
+    fun isParcelableArray(type: TypeMirror): Boolean {
+        return if(!type.toString().contains("java.util.ArrayList")) {
+            false
+        }
+        else if(type is DeclaredType && type.typeArguments.isNotEmpty()) {
+            val typeArgument = type.typeArguments[0]
+            val isValid = isParcelable(typeArgument)
+            if(!isValid) {
+                logError("Found annotated list field with type $type whose argument type $typeArgument does not implements Parcelable")
+            }
+            return isValid
+        } else {
+            false
+        }
+    }
+
+    fun isParcelableWithParceler(type: TypeMirror): Boolean {
+        var finalType = type
+        if(type.toString().contains("java.util.ArrayList") && type is DeclaredType && type.typeArguments.isNotEmpty()) {
+            finalType = type.typeArguments[0]
+        }
+
+        utils?.getTypeElement(finalType.toString())?.let {
+            return it.annotationMirrors?.any {
+                it.toString().contains("org.parceler.Parcel")
+            } ?: false
+        }
+        return false
+    }
+
     fun isArray(typeMirror: TypeMirror): Boolean {
         val array = processingEnvironment!!.elementUtils
                 .getTypeElement("").asType()
         return false
-    }
-
-    fun getPackpageFor(parentClass: Element): String {
-        var parent = parentClass.enclosingElement
-        while (parent !is PackageElement) {
-            parent = parent.enclosingElement
-        }
-        return parent.qualifiedName.toString()
-    }
-
-    private fun getCommonRootPackage(packpages: List<String>): String {
-        var parts = packpages[0].split(".")
-        var canditatePackage = ""
-
-        parts.filter { part ->
-            packpages.all {
-                val index = parts.indexOf(part)
-                if (it.split(".").size <= index) {
-                    false
-                }
-                else {
-                    it.split(".")[index] == part
-                }
-            }
-        }.forEach { canditatePackage += it + "." }
-
-        return canditatePackage.substring(0, canditatePackage.length - 1)
-    }
-
-    fun getCommonRootPackage(annotatedFields: Set<Element>): String {
-        val packpages = annotatedFields.map { getPackpageFor(it) }
-        return getCommonRootPackage(packpages)
-    }
-
-    fun isTypeAnnotatedWith(annotationClass: String): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
 }

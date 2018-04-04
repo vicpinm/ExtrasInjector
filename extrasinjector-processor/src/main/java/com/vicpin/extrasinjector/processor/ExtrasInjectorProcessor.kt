@@ -13,6 +13,9 @@ import javax.annotation.processing.SupportedAnnotationTypes
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.TypeElement
 
+/**
+ * Created by victor on 10/12/17.
+ */
 @SupportedAnnotationTypes("com.vicpin.extrasprocessor.annotations.ForFragment", "com.vicpin.extrasprocessor.annotations.ForActivity", "com.vicpin.extrasprocessor.annotations.InjectExtra")
 class ExtrasInjectorProcessor : AbstractProcessor() {
 

@@ -32,7 +32,7 @@ class ParentActivity : Activity {
     var presenter : Presenter
     
     initPresenter() {
-        ExtrasInjector.inject(this, presenter)
+        ExtrasInjector.bind(this, presenter)
     }
 }
 ````
@@ -62,8 +62,8 @@ repositories {
     mavenCentral()
 }
 
-implementation "com.github.vicpinm:extrasinjector:1.0.0"
-kapt "com.github.vicpinm:extrasinjector-processor:1.0.1"
+implementation "com.github.vicpinm:extrasinjector:1.0.10"
+kapt "com.github.vicpinm:extrasinjector-processor:1.0.8"
 
 ```
 

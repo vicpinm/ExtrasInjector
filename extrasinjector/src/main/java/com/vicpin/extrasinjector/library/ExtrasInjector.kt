@@ -2,11 +2,12 @@ package com.vicpin.extrasinjector.library
 
 import android.app.Activity
 import android.support.v4.app.Fragment
+import android.util.Log
 
 /**
  * Created by Victor on 04/04/2018.
  */
-class ExtrasInjector {
+object ExtrasInjector {
 
     val FACTORY_CLASS = "com.vicpin.extrasinjector.ExtrasInjectorFactory"
 
@@ -20,7 +21,7 @@ class ExtrasInjector {
                 throw ex
             }
         } catch (ex: ClassNotFoundException) {
-            throw IllegalStateException("Either kapt has not been executed or it has been executed but the annotation processor has not found any class annotated with @ForFragment")
+            Log.w("ExtrasInjector","Either kapt has not been executed or it has been executed but the annotation processor has not found any class annotated with @ForFragment")
         } catch (ex: Exception) {
             throw ex
         }
@@ -36,7 +37,7 @@ class ExtrasInjector {
                 throw ex
             }
         } catch (ex: ClassNotFoundException) {
-            throw IllegalStateException("Either kapt has not been executed or it has been executed but the annotation processor has not found any class annotated with @ForActivity")
+            Log.w("ExtrasInjector","Either kapt has not been executed or it has been executed but the annotation processor has not found any class annotated with @ForActivity")
         } catch (ex: Exception) {
             throw ex
         }

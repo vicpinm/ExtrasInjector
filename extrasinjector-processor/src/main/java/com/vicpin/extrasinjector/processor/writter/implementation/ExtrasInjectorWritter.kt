@@ -74,7 +74,7 @@ class ExtrasInjectorWritter : Writter() {
             for(presenter in activityPresenters) {
                 methodBody("is $presenter -> bind(act, target)", indentationLevel = 1)
             }
-            methodBody("else -> throw IllegalArgumentException(\"Target \${target::class.java.name} supplied to bind function is not valid. Have you annotated this class with @ForActivity?\")")
+            methodBody("else -> android.util.Log.w(\"ExtrasInjector\",\"Target \${target::class.java.name} supplied to bind function is not valid. Have you annotated this class with @ForActivity?\")")
             methodBody("}")
             closeMethod()
         }
@@ -87,7 +87,7 @@ class ExtrasInjectorWritter : Writter() {
             for(presenter in fragmentPresenters) {
                 methodBody("is $presenter -> bind(act, target)", indentationLevel = 1)
             }
-            methodBody("else -> throw IllegalArgumentException(\"Target \${target::class.java.name} supplied to bind function is not valid. Have you annotated this class with @ForFragment?\")")
+            methodBody("else -> android.util.Log.w(\"ExtrasInjector\",\"Target \${target::class.java.name} supplied to bind function is not valid. Have you annotated this class with @ForFragment?\")")
             methodBody("}")
             closeMethod()
         }

@@ -3,4 +3,7 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="next">Start next activity</string>
+    <string name="back">Back</string>
+    <string name="extras_info">Fill the fields with your data and click the button to see how next activity receives your data</string>
 </resources>

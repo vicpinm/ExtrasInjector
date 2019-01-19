@@ -6,7 +6,7 @@ import android.support.v4.app.Fragment
 /**
  * Created by Victor on 04/04/2018.
  */
-object ExtrasInjector {
+class ExtrasInjector {
 
     val FACTORY_CLASS = "com.vicpin.extrasinjector.ExtrasInjectorFactory"
 

@@ -61,8 +61,8 @@ repositories {
     mavenCentral()
 }
 
-implementation "com.github.vicpinm:extrasinjector:1.0.10"
-kapt "com.github.vicpinm:extrasinjector-processor:1.0.8"
+implementation "com.github.vicpinm:extrasinjector:1.2.0"
+kapt "com.github.vicpinm:extrasinjector-processor:1.2.0"
 
 ```
 

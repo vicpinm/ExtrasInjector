@@ -1,1 +1,1 @@
-include ':app', ':extrasinjector-annotations', ':extrasinjector-processor', ':extrasinjector'
+include ':app', ':extrasinjector', ':extrasinjector-annotations', ':extrasinjector-processor'

@@ -6,7 +6,6 @@ import com.vicpin.extrasprocessor.annotations.InjectExtra
 /**
  * Created by victor on 25/1/18.
  */
-
 @ForActivity(DetailsActivity::class)
 class DetailsPresenter(view: DetailsPresenter.View): Presenter<DetailsPresenter.View>(view) {
 

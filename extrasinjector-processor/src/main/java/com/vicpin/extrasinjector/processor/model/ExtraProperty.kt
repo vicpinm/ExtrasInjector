@@ -31,11 +31,6 @@ class ExtraProperty(annotatedField: Element) {
 
         getViewClass(annotatedField.enclosingElement)
 
-        EnvironmentUtil.logWarning("name: $name type $type presenter $presenterClass activity $activityClass annotations ${ annotatedField.asType().annotationMirrors.size}")
-
-        for(modifier in annotatedField.modifiers) {
-            EnvironmentUtil.logWarning("name $name modifiers $modifier")
-        }
         if (annotatedField.modifiers.contains(Modifier.PRIVATE)) {
             // EnvironmentUtil.logError("field $name in class $$presenterClass has to be public in order to inject extras")
         }

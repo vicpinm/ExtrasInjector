@@ -18,7 +18,7 @@ class FragmentsWritter : ExtrasWritter() {
 
     override fun generateImports() {
         writter.writeImport("import android.content.Intent")
-        writter.writeImport("import android.support.v4.app.Fragment")
+        writter.writeImport("import androidx.fragment.app.Fragment")
         writter.writeImport("import android.os.Bundle")
     }
 

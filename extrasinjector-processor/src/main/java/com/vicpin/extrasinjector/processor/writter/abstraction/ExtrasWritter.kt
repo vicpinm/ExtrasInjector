@@ -2,7 +2,6 @@ package com.vicpin.extrasinjector.processor.writter.abstraction
 
 import com.vicpin.butcherknife.annotation.processor.entity.ExtraProperty
 import com.vicpin.extrasinjector.processor.model.Model
-import com.vicpin.extrasinjector.processor.util.EnvironmentUtil
 import com.vicpin.extrasinjector.processor.writter.FileWritter
 import javax.annotation.processing.ProcessingEnvironment
 
@@ -19,12 +18,6 @@ abstract class ExtrasWritter : Writter() {
         if(extrasForClasses.isNotEmpty()) {
             createPackage(FileWritter.PACKAGE)
             generateImports()
-
-            val importParceler = extrasForClasses.values.any { extrasGrouped -> extrasGrouped.any { EnvironmentUtil.isParcelableWithParceler(it.type) } }
-
-            if(importParceler) {
-                writter.writeImport("import org.parceler.Parcels")
-            }
 
             generateClass()
 

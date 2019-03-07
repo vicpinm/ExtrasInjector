@@ -37,7 +37,7 @@
         android:paddingBottom="10dp"
         android:text="Data #2: boolean value (mandatory)" />
 
-    <android.support.v7.widget.SwitchCompat
+    <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/booleanValue"
         android:layout_width="wrap_content"
         android:layout_marginBottom="30dp"

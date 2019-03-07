@@ -1,7 +1,7 @@
 package com.vicpin.extrasinjector.sample
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.vicpin.extrasinjector.library.ExtrasInjector
 
 abstract class ParentActivity: AppCompatActivity() {

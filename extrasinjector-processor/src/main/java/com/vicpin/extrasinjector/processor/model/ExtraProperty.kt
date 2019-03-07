@@ -1,7 +1,6 @@
 package com.vicpin.butcherknife.annotation.processor.entity
 
 import com.vicpin.extrasinjector.processor.util.EnvironmentUtil
-import com.vicpin.extrasinjector.processor.util.EnvironmentUtil.isParcelableWithParceler
 import com.vicpin.extrasprocessor.annotations.ForActivity
 import com.vicpin.extrasprocessor.annotations.ForFragment
 import com.vicpin.extrasprocessor.annotations.InjectExtra
@@ -94,28 +93,13 @@ class ExtraProperty(annotatedField: Element) {
         return typeString
     }
 
-    fun getArgumentsPutMethod(argumentsVariable: String) = if(isParcelableWithParceler(type)) {
-        "$argumentsVariable.${putMethod()}(\"$name\",Parcels.wrap($name))"
-    }
-    else{
-        "$argumentsVariable.${putMethod()}(\"$name\",$name)"
-    }
+    fun getArgumentsPutMethod(argumentsVariable: String) = "$argumentsVariable.${putMethod()}(\"$name\",$name)"
 
-    fun getIntentPutMethod(intentVariable: String) = if(isParcelableWithParceler(type)) {
-        "$intentVariable.putExtra(\"$name\",Parcels.wrap($name))"
-    }
-    else{
-        "$intentVariable.putExtra(\"$name\",$name)"
-    }
+    fun getIntentPutMethod(intentVariable: String) = "$intentVariable.putExtra(\"$name\",$name)"
 
 
     fun getBindMethod(targetVariable: String) : String {
-        var line = if(isParcelableWithParceler(type)) {
-            "$targetVariable.$name = Parcels.unwrap(${getMethod()}(\"$name\"))"
-        }
-        else{
-            "$targetVariable.$name = ${getMethod()}(\"$name\")"
-        }
+        var line = "$targetVariable.$name = ${getMethod()}(\"$name\")"
 
         if(!type.kind.isPrimitive && type.toString() != String::class.java.name
                 && !type.toString().contains("java.util.ArrayList")
@@ -135,7 +119,6 @@ class ExtraProperty(annotatedField: Element) {
             type.kind == TypeKind.BOOLEAN -> "putBoolean"
             type.kind == TypeKind.CHAR -> "putString"
             type.toString() == String::class.java.name -> "putString"
-            isParcelableWithParceler(type) -> "putParcelable"
             EnvironmentUtil.isParcelableArray(type) -> "putParcelableArrayList"
             EnvironmentUtil.isParcelable(type) -> "putParcelable"
             EnvironmentUtil.isSerializable(type) -> "putSerializable"
@@ -155,7 +138,6 @@ class ExtraProperty(annotatedField: Element) {
             type.kind == TypeKind.BOOLEAN -> "getBoolean"
             type.kind == TypeKind.CHAR -> "getString"
             type.toString() == String::class.java.name -> "getString"
-            EnvironmentUtil.isParcelableWithParceler(type) -> "getParcelable"
             EnvironmentUtil.isParcelableArray(type) -> "getParcelableArrayList"
             EnvironmentUtil.isParcelable(type) -> "getParcelable"
             EnvironmentUtil.isSerializable(type) -> "getSerializable"

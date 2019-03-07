@@ -72,9 +72,6 @@ class Model private constructor() {
         return map
     }
 
-    fun useParcelerLibrary() = extraProperties.any { EnvironmentUtil.isParcelableWithParceler(it.type) }
-
-
     companion object {
 
         fun buildFrom(env: RoundEnvironment, annotations: Set<String>): Model {

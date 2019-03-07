@@ -65,20 +65,6 @@ object EnvironmentUtil {
         }
     }
 
-    fun isParcelableWithParceler(type: TypeMirror): Boolean {
-        var finalType = type
-        if(type.toString().contains("java.util.ArrayList") && type is DeclaredType && type.typeArguments.isNotEmpty()) {
-            finalType = type.typeArguments[0]
-        }
-
-        utils?.getTypeElement(finalType.toString())?.let {
-            return it.annotationMirrors?.any {
-                it.toString().contains("org.parceler.Parcel")
-            } ?: false
-        }
-        return false
-    }
-
     fun isArray(typeMirror: TypeMirror): Boolean {
         val array = processingEnvironment!!.elementUtils
                 .getTypeElement("").asType()

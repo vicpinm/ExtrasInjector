@@ -1,7 +1,6 @@
 package com.vicpin.extrasinjector.library
 
 import android.app.Activity
-import android.support.v4.app.Fragment
 import android.util.Log
 
 /**
@@ -11,10 +10,10 @@ object ExtrasInjector {
 
     val FACTORY_CLASS = "com.vicpin.extrasinjector.ExtrasInjectorFactory"
 
-    fun bind(act: Fragment, target: Any) {
+    fun bind(act: androidx.fragment.app.Fragment, target: Any) {
         try {
             val clazz = Class.forName(FACTORY_CLASS)
-            val method = clazz.getMethod("bind", Fragment::class.java, Any::class.java)
+            val method = clazz.getMethod("bind", androidx.fragment.app.Fragment::class.java, Any::class.java)
             try {
                 method.invoke(null, act, target)
             } catch (ex: IllegalArgumentException) {
@@ -30,7 +29,7 @@ object ExtrasInjector {
     fun bind(act: Activity, target: Any) {
         try {
             val clazz = Class.forName(FACTORY_CLASS)
-            val method = clazz.getMethod("bind", Fragment::class.java, Any::class.java)
+            val method = clazz.getMethod("bind", androidx.fragment.app.Fragment::class.java, Any::class.java)
             try {
                 method.invoke(null, act, target)
             } catch (ex: IllegalArgumentException) {

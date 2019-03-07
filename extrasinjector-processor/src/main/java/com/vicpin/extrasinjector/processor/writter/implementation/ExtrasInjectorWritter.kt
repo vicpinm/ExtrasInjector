@@ -15,13 +15,12 @@ class ExtrasInjectorWritter : Writter() {
 
     override fun createPackage(packpage: String) {
         writter.setPackage(packpage)
-
     }
 
     override fun generateImports() {
         writter.writeImport("import android.content.Context")
         writter.writeImport("import android.app.Activity")
-        writter.writeImport("import android.support.v4.app.Fragment")
+        writter.writeImport("import androidx.fragment.app.Fragment")
     }
 
     override fun generateClass() {
@@ -36,11 +35,6 @@ class ExtrasInjectorWritter : Writter() {
 
             createPackage(FileWritter.PACKAGE)
             generateImports()
-
-            if(model.useParcelerLibrary()) {
-                writter.writeImport("import org.parceler.Parcels")
-            }
-
             generateClass()
 
             if(extrasByActivityPresenters.isNotEmpty()) {

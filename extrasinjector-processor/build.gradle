@@ -8,7 +8,7 @@ dependencies {
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.squareup:javapoet:1.8.0'
-    implementation("com.github.vicpinm:extrasinjector-annotations:1.0.0")
+    api("com.github.vicpinm:extrasinjector-annotations:1.0.0")
 
 }
 

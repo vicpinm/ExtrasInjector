@@ -60,7 +60,11 @@ Grab via Gradle:
 repositories {
     mavenCentral()
 }
+//For androidX libraries compatibility:
+implementation "com.github.vicpinm:extrasinjector:1.3.1"
+kapt "com.github.vicpinm:extrasinjector-processor:1.3.1"
 
+//If you use old appCompat libraries:
 implementation "com.github.vicpinm:extrasinjector:1.2.0"
 kapt "com.github.vicpinm:extrasinjector-processor:1.2.0"
 

@@ -52,6 +52,12 @@ val myFragment = Fragments.createDetailsFragment(extras...)
 ````
 These generated methods allow you to pass only the arguments you have specified in your destination class (presenter, viewModel). Following this example, we have a class 'MyPresenter' with two annotated fields: userId: Long (mandatory) and userDetails: UserDetails? (optional). Therefore, these methods will expect a mandatory Long argument (userId), and an optional 'UserDetails' argument. You can check the sample project to see a real sample. 
 
+## Proguard
+If you are using proguard, you have to add this rules to your proguard-rules.pro:
+```
+-keep class com.vicpin.extrasinjector.**  { *; }
+```
+
 ## Download 
 
 Grab via Gradle:

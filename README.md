@@ -67,7 +67,7 @@ repositories {
     mavenCentral()
 }
 //For androidX libraries compatibility:
-implementation "com.github.vicpinm:extrasinjector:1.3.1"
+implementation "com.github.vicpinm:extrasinjector:1.3.2"
 kapt "com.github.vicpinm:extrasinjector-processor:1.3.1"
 
 //If you use old appCompat libraries:
